@@ -10,7 +10,7 @@ const BackgroundParticles = () => {
 
     return (
         <Particles
-            className=""
+            className="particles"
             id="tsparticles"
             init={particlesInit}
             options={{

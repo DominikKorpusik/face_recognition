@@ -5,7 +5,8 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
-import BackgroundPartiles from './components/BackgroundParticles/BackgroundParticles'
+import BackgroundPartiles from './components/BackgroundParticles/BackgroundParticles';
+
 
 class App extends Component {
   constructor() {
@@ -27,10 +28,15 @@ class App extends Component {
     const width = Number(image.width);
     const height = Number(image.height);
     return {
-
+      left: clarifaiFace.left_col * width,
+      top: clarifaiFace.top_row * height,
+      right: width - (clarifaiFace.right_col * width),
+      bottom: height - (clarifaiFace.bottom_row * height)
     }
-    console.log(image);
-    console.log(clarifaiFace);
+  }
+
+  displayFaceBox = (box) => {
+    this.setState({ box: box });
   }
 
   onButtonSubmit = () => {
@@ -73,7 +79,7 @@ class App extends Component {
 
     fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/outputs", requestOptions)
       .then(response => response.json())
-      .then(result => this.calculateFaceLocation(result))
+      .then(result => this.displayFaceBox(this.calculateFaceLocation(result)))
       .catch(error => console.log('Error:', error));
   }
 
@@ -85,7 +91,7 @@ class App extends Component {
         <Logo />
         <Rank />
         <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
-        <FaceRecognition imageURL={this.state.imageURL} />
+        <FaceRecognition box={this.state.box} imageURL={this.state.imageURL} />
       </div>
     );
   }

@@ -6,6 +6,8 @@ import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import BackgroundPartiles from './components/BackgroundParticles/BackgroundParticles';
+import SignIn from './components/SignIn/SignIn';
+import Register from './components/Register/Register';
 
 
 class App extends Component {
@@ -15,6 +17,8 @@ class App extends Component {
       input: '',
       imageURL: '',
       box: {},
+      route: 'signIn',
+      isSignedIn: false
     }
   }
 
@@ -35,7 +39,7 @@ class App extends Component {
     }
   }
 
-  displayFaceBox = (box) => {
+  drawingFaceBox = (box) => {
     this.setState({ box: box });
   }
 
@@ -79,19 +83,38 @@ class App extends Component {
 
     fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/outputs", requestOptions)
       .then(response => response.json())
-      .then(result => this.displayFaceBox(this.calculateFaceLocation(result)))
+      .then(result => this.drawingFaceBox(this.calculateFaceLocation(result)))
       .catch(error => console.log('Error:', error));
   }
 
+  onRouteChange = (route) => {
+    if (route === 'signOut') {
+      this.setState({ isSignedIn: false })
+    } else {
+      this.setState({ isSignedIn: true })
+    }
+    this.setState({ route: route })
+  }
+
   render() {
+    const { isSignedIn, box, imageURL, route } = this.state;
     return (
       <div className="App">
-        <Navigation />
         <BackgroundPartiles />
+        <Navigation isSignedId={isSignedIn} onRouteChange={this.onRouteChange} />
         <Logo />
-        <Rank />
-        <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
-        <FaceRecognition box={this.state.box} imageURL={this.state.imageURL} />
+        {route === 'home' ?
+          <>
+            <Rank />
+            <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+            <FaceRecognition box={box} imageURL={imageURL} />
+          </>
+
+          : (route === 'signIn') ?
+            <SignIn onRouteChange={this.onRouteChange} />
+            :
+            <Register onRouteChange={this.onRouteChange} />
+        }
       </div>
     );
   }
